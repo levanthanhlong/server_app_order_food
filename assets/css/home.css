@@ -1,0 +1,194 @@
+body {
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  background-color: #f7f7f7;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #2d3748;
+  color: #fff;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar h2 {
+  margin-bottom: 24px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 12px 0;
+  display: block;
+  border-bottom: 1px solid #444;
+}
+
+.sidebar li a:hover {
+  color: #00bcd4;
+}
+
+.content {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+h2 {
+  margin-bottom: 16px;
+  border-bottom: 2px solid #00bcd4;
+  padding-bottom: 8px;
+}
+
+.food-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 32px;
+}
+
+.food-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* text-align: center; */
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#showMessage {
+  flex: 1;
+  text-align: center;
+}
+
+.food-card img {
+  width: 100%;
+  border-radius: 8px;
+  height: 160px;
+  object-fit: cover;
+}
+
+.food-card h3 {
+  margin: 12px 0 8px;
+}
+
+.food-card p {
+  margin: 4px 0;
+}
+.ordered-text {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.btn-disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.order-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.order-btn:hover {
+  background-color: #0097a7;
+}
+
+/* Order History Table Styling */
+#orderHistoryTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#orderHistoryTable thead {
+  background-color: #4caf50;
+  color: white;
+}
+
+#orderHistoryTable thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 16px;
+}
+
+#orderHistoryTable tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 15px;
+  color: #333;
+}
+
+#orderHistoryTable tbody tr:hover {
+  background-color: #f9f9f9;
+  transition: background-color 0.2s ease;
+}
+
+#orderHistoryTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  #orderHistoryTable thead {
+    display: none;
+  }
+
+  #orderHistoryTable,
+  #orderHistoryTable tbody,
+  #orderHistoryTable tr,
+  #orderHistoryTable td {
+    display: block;
+    width: 100%;
+  }
+
+  #orderHistoryTable tr {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    background-color: white;
+  }
+
+  #orderHistoryTable td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  #orderHistoryTable td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 16px;
+    width: 45%;
+    padding-right: 10px;
+    font-weight: bold;
+    text-align: left;
+    color: #555;
+  }
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register Page</title>
+    <link href="/assets/css/register.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="register-container">
+      <div class="register-box">
+        <div style="width: 100%; text-align: left">
+          <a
+            href="/homeAdmin/userManagerPage"
+            style="
+              text-decoration: none;
+              font-weight: 400;
+              color: #000;
+              font-size: large;
+            "
+          >
+            ⬅ Quay lại
+          </a>
+        </div>
+        <h2
+          style="
+            margin-bottom: 16px;
+            padding-bottom: 32px;
+            border-bottom: 2px solid green;
+          "
+        >
+         Tạo tài khoản mới
+        </h2>
+        <form action="" id="createUserForm" method="post">
+          <div class="textbox">
+            <input
+              type="text"
+              placeholder="Username"
+              name="username"
+              required
+            />
+          </div>
+          <div class="textbox">
+            <input
+              type="text"
+              placeholder="Full Name"
+              name="fullname"
+              required
+            />
+          </div>
+          <div class="textbox">
+            <input
+              type="text"
+              placeholder="Employee Code"
+              name="employeeCode"
+              required
+            />
+          </div>
+          <div class="textbox">
+            <input
+              type="password"
+              placeholder="Password"
+              name="password"
+              required
+            />
+          </div>
+          <div class="textbox">
+            <select name="role" required>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <input type="submit" value="Register" class="btn" />
+        </form>
+      </div>
+    </div>
+  </body>
+  <script>
+    const form = document.getElementById("createUserForm");
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault(); // Ngăn form reload trang
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch("/api/user/createNewUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+        if (result.status === 1) {
+          alert(" Tạo tài khoản thành công!");
+          function delay(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+          }
+          form.reset();
+          // Sử dụng hàm delay
+          delay(1000).then(() => {
+            console.log("Đã trễ 1 giây!");
+            window.location.href = "/homeAdmin/userManagerPage";
+          });
+        } else {
+          alert("  " + result.message);
+        }
+      } catch (error) {
+        alert("  Có lỗi xảy ra khi tạo tài khoản!");
+        console.error("Lỗi gửi request:", error);
+      }
+    });
+  </script>
+</html>

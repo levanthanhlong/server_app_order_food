@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trang Admin - Quản lý nhân viên</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link href="../../assets/css/user_manager.css" rel="stylesheet" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h1>Admin Món Ăn</h1>
+      <nav>
+        <ul>
+          <li><a href="/homeAdmin">🍽️ Quản lý món ăn</a></li>
+          <li>
+            <a href="/homeAdmin/userManagerPage">👥 Quản Lý Người Dùng</a>
+          </li>
+          <li><a href="/api/user/logout" class="logout">🚪 Đăng Xuất</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <h2>Quản lý danh sách người dùng</h2>
+        <a href="/homeAdmin/createUserPage" class="action-btn edit-btn"
+          >Tạo tài khoản mới</a
+        >
+      </div>
+      <table id="foodItemsTable">
+        <thead>
+          <tr>
+            <th>Tên đăng nhập</th>
+            <th>Họ và tên</th>
+            <th>Mã nhân viên</th>
+            <th>Vai trò</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="userList">
+          <!--  hiển thị danh sách nhân viên quan JavaScript -->
+        </tbody>
+      </table>
+    </main>
+  </body>
+  <script>
+    // Hàm gọi API để lấy toàn bộ danh sách người dùng
+    async function fetchAllUsers() {
+      try {
+        const res = await fetch("/api/user/getAllUsers");
+        const data = await res.json();
+
+        if (data.status === 1) {
+          const users = data.data;
+          const userList = document.getElementById("userList");
+          userList.innerHTML = ""; // Xóa sạch trước khi hiển thị
+
+          users.forEach((user) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${user.username}</td>
+              <td>${user.fullname || ""}</td>
+              <td>${user.employee_code || ""}</td>
+              <td>${user.role}</td>
+              <td>
+                <a href="/homeAdmin/userManagerPage/ordersUserManagerPage/${
+                  user.id
+                }"
+                 class="action-btn edit-btn">Orders</a>
+                <a href="#" onclick="deleteUser(${
+                  user.id
+                })" class="action-btn delete-btn">Xoá</a>
+              </td>
+            `;
+            userList.appendChild(tr);
+          });
+        } else {
+          console.error("Lỗi khi lấy danh sách:", data.message);
+        }
+      } catch (err) {
+        console.error("Lỗi fetchAllUsers:", err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchAllUsers);
+
+    // function delete user
+  async  function deleteUser(id) {
+      if (confirm("Bạn có chắc muốn xoá user này không?")) {
+        const res = await fetch(`/api/user/deleteUser/${id}`, {
+          method: "DELETE",
+        })
+
+        const data = await res.json();
+
+        if (data.status === 1) {
+              alert(data.message);
+              fetchAllUsers(); // load lại danh sách
+            } else {
+              alert(data.message);
+            }
+      }
+    }
+  </script>
+</html>

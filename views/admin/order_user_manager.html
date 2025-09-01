@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trang Admin - Quản lý Orders</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link href="/assets/css/order_user_manager.css" rel="stylesheet" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h1>Admin Món Ăn</h1>
+      <nav>
+        <ul>
+          <li><a href="/homeAdmin">🍽️ Quản lý món ăn</a></li>
+          <li>
+            <a href="/homeAdmin/userManagerPage">👥 Quản Lý Người Dùng</a>
+          </li>
+          <li><a href="/api/user/logout" class="logout">🚪 Đăng Xuất</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <h2>Danh Sách Orders của người dùng</h2>
+        <div class="order-filter-container">
+          <label for="month">Tháng:</label>
+          <select id="month">
+            <option value="">-- Chọn tháng --</option>
+            <option value="1">Tháng 1</option>
+            <option value="2">Tháng 2</option>
+            <option value="3">Tháng 3</option>
+            <option value="4">Tháng 4</option>
+            <option value="5">Tháng 5</option>
+            <option value="6">Tháng 6</option>
+            <option value="7">Tháng 7</option>
+            <option value="8">Tháng 8</option>
+            <option value="9">Tháng 9</option>
+            <option value="10">Tháng 10</option>
+            <option value="11">Tháng 11</option>
+            <option value="12">Tháng 12</option>
+          </select>
+          <label for="year">Năm:</label>
+          <select id="year">
+            <option value="">-- Chọn năm --</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+          </select>
+          <button onclick="fetchOrders()">Find</button>
+        </div>
+      </div>
+      <table id="ordersTable">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên Món Ăn</th>
+            <th>Giá (VNĐ)</th>
+            <th>Ngày cung cấp</th>
+            <th>Hành Động</th>
+          </tr>
+        </thead>
+        <tbody id="orderItemsList">
+          <!-- Các orders sẽ được thêm vào đây thông qua JavaScript -->
+        </tbody>
+      </table>
+
+      <div id="showTotalMoney">
+        <!-- hiển thị tổng số tiền phải trả trong tháng -->
+      </div>
+    </main>
+  </body>
+  <script>
+    const pathParts = window.location.pathname.split("/");
+    const userId = pathParts[pathParts.length - 1];
+
+    async function fetchOrders() {
+      const month = document.getElementById("month").value;
+      const year = document.getElementById("year").value;
+
+      if (!month || !year) {
+        alert("Vui lòng chọn đầy đủ tháng và năm!");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/orders/getAllOrderByUserIdForMonthYear/${userId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ month, year }),
+          }
+        );
+
+        const result = await response.json();
+
+        if (result.status === 1) {
+          const orders = result.data;
+          const orderItemsList = document.getElementById("orderItemsList");
+          const showTotalMoney = document.getElementById("showTotalMoney");
+          orderItemsList.innerHTML = ""; // Xóa dữ liệu cũ
+          showTotalMoney.innerHTML = "";
+          var totalMoney = 0;
+          if (orders.length === 0) {
+            orderItemsList.innerHTML = `<tr><td colspan="5">Không có đơn hàng nào trong tháng ${month}/${year}</td></tr>`;
+            return;
+          }
+
+          orders.forEach((order, index) => {
+            totalMoney = totalMoney + order.price;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${order.name_food}</td>
+              <td>${(order.price ?? 0).toLocaleString()} VNĐ</td>
+              <td>${new Date(order.order_date).toLocaleDateString("vi-VN")}</td>
+              <td>
+                <a href="#" onclick="deleteOrder(${
+                  order.id
+                })" class="action-btn delete-btn">Xoá</a>
+              </td>
+              
+            `;
+
+            orderItemsList.appendChild(row);
+          });
+          showTotalMoney.innerHTML = `</br><h2>Tổng tiền trong tháng: ${(totalMoney ?? 0).toLocaleString()} VND</h2>`;
+        } else {
+          alert("Lỗi khi tải đơn hàng!");
+        }
+      } catch (error) {
+        console.error("Lỗi fetchOrders:", error);
+        alert(error);
+      }
+    }
+
+    // Hàm xóa đơn hàng (tuỳ chọn nếu bạn muốn hỗ trợ xóa)
+    async function deleteOrder(orderId) {
+      if (!confirm("Bạn có chắc muốn xoá đơn hàng này?")) return;
+
+      try {
+        const response = await fetch(`/api/orders/delete/${orderId}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+
+        if (result.status === 1) {
+          alert("Xoá thành công!");
+          fetchOrders(); // Reload danh sách
+        } else {
+          alert("Xoá thất bại!");
+        }
+      } catch (error) {
+        console.error("Lỗi khi xoá đơn hàng:", error);
+        alert("Lỗi server khi xoá.");
+      }
+    }
+  </script>
+</html>

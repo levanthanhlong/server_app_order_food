@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Trang Admin - Quản lý Món Ăn</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link href="../../assets/css/home_admin.css" rel="stylesheet" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h1>Admin Món Ăn</h1>
+      <nav>
+        <ul>
+          <li><a href="/homeAdmin">🍽️ Quản lý món ăn</a></li>
+          <li>
+            <a href="/homeAdmin/userManagerPage">👥 Quản Lý Người Dùng</a>
+          </li>
+          <li><a href="/api/user/logout" class="logout">🚪 Đăng Xuất</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <h2>Danh Sách Món Ăn</h2>
+        <a href="/homeAdmin/createFoodItem" class="action-btn edit-btn"
+          >Tạo món ăn mới</a
+        >
+      </div>
+      <table id="foodItemsTable">
+        <thead>
+          <tr>
+            <th>Tên Món Ăn</th>
+            <th>Mô Tả</th>
+            <th>Giá (VNĐ)</th>
+            <th>Ngày Cung Cấp</th>
+            <th>Số đơn đặt </th>
+            <th>Hành Động</th>
+          </tr>
+        </thead>
+        <tbody id="foodItemsList">
+          <!-- Các món ăn sẽ được thêm vào đây thông qua JavaScript -->
+        </tbody>
+      </table>
+    </main>
+    <script>
+      // Fetch food items và hiển thị chúng
+      async function fetchFoodItems() {
+        console.log("load-----------------");
+        try {
+          const res = await fetch("/api/foodItems/getAllFoodItems", {
+            method: "GET",
+            cache: "no-store", // lấy dữ liệu mới từ server
+          });
+          const foodItemsList = document.getElementById("foodItemsList");
+          foodItemsList.innerHTML = ""; //xóa DS hiển thị hiện có
+          const result = await res.json(); //convert sang json -> gán cho biến
+          if (!result.data || result.data.length === 0) {
+            foodItemsList.innerHTML =
+              "<tr><td colspan='5'>Không có món ăn nào.</td></tr>";
+            return;
+          }
+          // Dùng forEach để duyệt qua từng ptử
+          result.data.forEach((item) => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+    <td>${item.name_food}</td>
+    <td>${
+      item.description.length > 50
+        ? item.description.substring(0, 50) + "..."
+        : item.description
+    }</td>
+    <td>${item.price} VNĐ</td>
+    <td>${new Date(item.available_date).toLocaleDateString("vi-VN")}</td>
+    <td>${item.total_ordered}</td>
+    <td>
+      <a href="/homeAdmin/updateFoodItem/${
+        item.id
+      }" class="action-btn edit-btn">Edit</a>
+      <a href="#" onclick="deleteFoodItem(${
+        item.id
+      })" class="action-btn delete-btn">Xoá</a>
+    </td>
+  `;
+
+            foodItemsList.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Lỗi khi tải danh sách món ăn:", error);
+        }
+      }
+      //Lắng nghe sự kiện reload -> fọi hàm fetchFoodItems để lấy DS món ăn
+      document.addEventListener("DOMContentLoaded", fetchFoodItems);
+
+      /// function delete food item
+        async function deleteFoodItem(id)  {
+
+        if (confirm("Bạn có chắc muốn xoá món ăn này không?")) 
+        {
+
+         const res = await fetch(`/api/foodItems/deleteFoodItem/${id}`, {
+            method: "DELETE",
+          });
+          // convert response từ json -> đối tượng
+          const data = await res.json();
+          if (data.status === 1) {
+                alert(data.message);
+                fetchFoodItems(); // load lại danh sách
+              } else {
+                alert(data.message);
+              }
+        }
+      }
+    </script>
+  </body>
+</html>

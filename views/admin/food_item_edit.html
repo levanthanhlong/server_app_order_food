@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cập nhật món ăn</title>
+    <link href="../../assets/css/food_item_edit.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <a
+        href="/homeAdmin"
+        style="
+          text-decoration: none;
+          font-weight: 400;
+          color: #000;
+          font-size: large;
+        "
+      >
+        ⬅ Quay lại
+      </a>
+      <h2>Cập nhật Món Ăn</h2>
+
+      <div id="alertBox" class="alert"></div>
+
+      <form id="editFoodForm" enctype="multipart/form-data">
+        <label for="nameFood">Tên món ăn</label>
+        <input type="text" id="nameFood" name="nameFood" required />
+
+        <label for="description">Mô tả</label>
+        <textarea id="description" name="description" required rows="3"></textarea>
+
+        <label for="price">Giá (VNĐ)</label>
+        <input type="number" id="price" name="price" required />
+
+        <label for="availableDate">Ngày cung cấp</label>
+        <input type="date" id="availableDate" name="availableDate" required />
+
+        <label>Hình ảnh hiện tại</label>
+        <img
+          id="currentImage"
+          src=""
+          alt="Ảnh món ăn"
+          style="
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            margin-bottom: 10px;
+          "
+        />
+
+        <label for="image">Cập nhật hình ảnh (nếu cần)</label>
+        <input type="file" id="image" name="image" accept="image/*" />
+
+        <button type="submit">Cập nhật món ăn</button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("editFoodForm");
+      const alertBox = document.getElementById("alertBox");
+
+      const pathParts = window.location.pathname.split("/");
+      const id = pathParts[pathParts.length - 1]; // Lấy id từ URL
+
+      async function loadFoodItemData() {
+        try {
+          const res = await fetch(
+            `/api/foodItems/getDetailFoodItemById/${id}`,
+            {
+              method: "GET",
+            }
+          );
+          const data = await res.json();
+          if (data.status === 1) {
+            const food = data.data;
+            document.getElementById("nameFood").value = food.name_food;
+            document.getElementById("description").value = food.description;
+            document.getElementById("price").value = food.price;
+            document.getElementById("availableDate").value = new Date(
+              food.available_date
+            )
+              .toISOString()
+              .split("T")[0];
+            document.getElementById("currentImage").src = food.image_url;
+          } else {
+            showAlert(data.message, "error");
+          }
+        } catch (error) {
+          console.error("Lỗi khi tải dữ liệu món ăn:", error);
+          showAlert("Lỗi khi tải dữ liệu món ăn", "error");
+        }
+      }
+
+      loadFoodItemData();
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        formData.append("id", id);
+
+        try {
+          const res = await fetch(`/api/foodItems/updateFoodItemById/${id}`, {
+            method: "PUT",
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          if (data.status === 1) {
+            showAlert(" " + data.message, "success");
+            setTimeout(() => (window.location.href = "/homeAdmin"), 2000);
+          } else {
+            showAlert(data.message, "error");
+          }
+        } catch (error) {
+          console.error(error);
+          showAlert("Lỗi kết nối đến server", "error");
+        }
+      });
+
+      function showAlert(message, type) {
+        alertBox.textContent = message;
+        alertBox.className = "alert " + type;
+        alertBox.style.display = "block";
+        setTimeout(() => {
+          alertBox.style.display = "none";
+        }, 4000);
+      }
+    </script>
+  </body>
+</html>

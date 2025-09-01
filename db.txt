@@ -1,0 +1,45 @@
+use food_ordering;
+
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    fullname VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL, 
+    employee_code VARCHAR(50) UNIQUE NOT NULL,
+    role ENUM('user', 'admin') DEFAULT 'user',  -- Phân quyền người dùng
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+SELECT * FROM users;
+DROP TABLE IF EXISTS users;
+
+
+CREATE TABLE food_items (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name_food VARCHAR(100) NOT NULL,
+    description TEXT,
+    price INT NOT NULL,  -- Giá của suất ăn (dùng INT vì giá VN chia hết cho 100)
+    image_url VARCHAR(255),  -- Ảnh món ăn
+    available_date DATE NOT NULL,  -- Ngày cung cấp món ăn
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+SELECT * FROM food_items;
+Drop table if exists food_items;
+
+CREATE TABLE orders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    food_id INT NOT NULL,  -- Món ăn duy nhất trong đơn
+    quantity INT NOT NULL DEFAULT 1,  -- Số suất ăn đặt
+    order_date DATE NOT NULL,
+    status ENUM('ordered', 'not_ordered') DEFAULT 'not_ordered',  -- Trạng thái đơn hàng
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (food_id) REFERENCES food_items(id) ON DELETE CASCADE
+);
+
+SELECT * FROM orders;
+DROP TABLE IF EXISTS orders;
+
+

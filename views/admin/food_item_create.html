@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thêm món ăn</title>
+    <link href="../../assets/css/create_food_item.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <a
+        href="/homeAdmin"
+        style="
+          text-decoration: none;
+          font-weight: 400;
+          color: #000;
+          font-size: large;
+        "
+      >
+        ⬅ Quay lại
+      </a>
+      <h2>Thêm Món Ăn</h2>
+
+      <div id="alertBox" class="alert">
+        <!-- hiển thị message lỗi hoặc thành công ở đây -->
+      </div>
+      <form id="foodForm" enctype="multipart/form-data">
+        <label for="name_food">Tên món ăn</label>
+        <input type="text" id="name_food" name="name_food" required />
+
+        <label for="description">Mô tả</label>
+        <textarea
+          id="description"
+          name="description"
+          rows="3"
+          required
+        ></textarea>
+
+        <label for="price">Giá (VNĐ)</label>
+        <input type="number" id="price" name="price" required />
+
+        <label for="available_date">Ngày cung cấp</label>
+        <input type="date" id="available_date" name="available_date" required />
+
+        <label for="image">Hình ảnh</label>
+        <input type="file" id="image" name="image" accept="image/*" required />
+        <button type="submit">Thêm món</button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("foodForm");
+      const alertBox = document.getElementById("alertBox");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+
+        try {
+          const res = await fetch("/api/foodItems/addNewFoodItem", {
+            method: "POST",
+            body: formData, // Gửi FormData mà không cần thiết lập Content-Type
+          });
+
+          const data = await res.json();
+
+          if (data.status === 1) {
+            showAlert(" " + data.message, "success");
+            function delay(ms) {
+              return new Promise((resolve) => setTimeout(resolve, ms));
+            }
+            form.reset();
+            // Sử dụng hàm delay
+            delay(2000).then(() => {
+              console.log("Đã trễ 2 giây!");
+              window.location.href = "/homeAdmin";
+            });
+          } else {
+            showAlert("  " + data.message, "error");
+          }
+        } catch (error) {
+          showAlert("  Lỗi kết nối server.", "error");
+          console.error(error);
+        }
+      });
+
+      //Thêm message vào thẻ alertBox
+      function showAlert(message, type) {
+        alertBox.textContent = message;
+        alertBox.className = "alert " + type;  //thêm tên class để dùng trong css
+        alertBox.style.display = "block";
+
+        setTimeout(() => {
+          alertBox.style.display = "none";
+        }, 4000);
+      }
+    </script>
+  </body>
+</html>

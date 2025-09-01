@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <link href="../assets/css/login.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="login-box">
+        <h2>Xin chào!</h2>
+        <p>Đăng nhập để tiếp tục</p>
+        
+        <form id="loginForm">
+          <div class="textbox">
+            <input type="text" placeholder="Tên đăng nhập" id="username" required />
+          </div>
+          <div class="textbox">
+            <input
+              type="password"
+              placeholder="Mật khẩu"
+              id="password"
+              required
+            />
+          </div>
+          <input type="submit" id="login" value="Login" class="btn" />
+          <div style="height: 20px"></div>
+          <i style="color:cadetblue">Nếu chưa có tài khoản liên hệ Admin</i>
+        </form>
+        <div style="height: 20px"></div>
+        <div id="showAlert">
+          <!-- show Alert error ở đây -->
+        </div>
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault(); // Ngăn chặn form submit mặc định
+
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
+          const showAlert = document.getElementById("showAlert");
+          //console.log("-------");
+          try {
+            const response = await fetch("/api/user/login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify( { username, password }),
+            });
+            
+            const data = await response.json();
+            console.log("-------");
+            if (data.status === 1) {
+              console.log(data.token);
+              // Lưu token vào localStorage (hoặc cookie)
+              localStorage.setItem("token", data.token);
+              // Kiểm tra username để điều hướng
+              if (username === "admin") {
+                window.location.href = "/homeAdmin";
+              } else {
+                window.location.href = "/home";
+              }
+            } else {
+              const newDiv = document.createElement("div");
+              newDiv.textContent = data.message;
+              newDiv.style.padding = "10px";
+              newDiv.style.backgroundColor = "#d0f0c0";
+              newDiv.style.color = "red";
+
+              showAlert.appendChild(newDiv);
+              // Xoá sau 2 giây
+              setTimeout(() => {
+                showAlert.removeChild(newDiv);
+              }, 2000);
+              // alert(data.message); // Hiển thị lỗi nếu đăng nhập thất bại
+            }
+          } catch (error) {
+            console.error("Lỗi:", error);
+            const newDiv = document.createElement("div");
+            newDiv.textContent = "Lỗi hệ thống, vui lòng thử lại!";
+            newDiv.style.padding = "10px";
+            newDiv.style.backgroundColor = "#d0f0c0";
+            newDiv.style.color = "red";
+            showAlert.appendChild(newDiv);
+            // Xoá sau 2 giây
+            setTimeout(() => {
+              showAlert.removeChild(newDiv);
+            }, 2000);
+            //alert("Lỗi hệ thống, vui lòng thử lại!");
+          }
+        });
+    </script>
+  </body>
+</html>

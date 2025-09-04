@@ -37,11 +37,14 @@ paths:
                   type: string
                 employeeCode:
                   type: string
+                role:
+                  type: string  
               required:
                 - username
                 - password
                 - fullname
                 - employeeCode
+                - role
       responses:
         "200":
           description: User registered successfully
@@ -143,7 +146,7 @@ paths:
                   example: 2
                 statusOrder:
                   type: string
-                  example: pending
+                  example: ordered
       responses:
         "201":
           description: Order created successfully
@@ -223,27 +226,34 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  count:
-                    type: integer
-                    example: 2
                   data:
                     type: array
                     items:
                       type: object
                       properties:
-                        orderId:
-                          type: integer
-                          example: 101
-                        userId:
+                        id:
                           type: integer
                           example: 1
-                        status:
+                        food_id:
+                          type: integer
+                          example: 2
+                        name_food:
                           type: string
-                          example: "completed"
-                        createdAt:
+                          example: "mon2"
+                        quantity:
+                          type: integer
+                          example: 2
+                        order_date:
                           type: string
                           format: date-time
-                          example: "2025-09-01T10:20:30Z"
+                          example: "2025-09-04T02:54:22.000Z"
+                        status:
+                          type: string
+                          example: "ordered"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-09-04T02:54:22.000Z"
         "401":
           description: Unauthorized - Missing or invalid token
         "500":
@@ -286,21 +296,39 @@ paths:
                     items:
                       type: object
                       properties:
-                        orderId:
-                          type: integer
-                          example: 105
-                        userId:
+                        id:
                           type: integer
                           example: 1
-                        status:
-                          type: string
-                          example: "pending"
-                        createdAt:
+                        food_id:
+                          type: integer
+                          example: 2
+                        order_date:
                           type: string
                           format: date-time
-                          example: "2025-09-01T14:30:00Z"
+                          example: "2025-09-04T02:54:22.000Z"
+                        quantity:
+                          type: integer
+                          example: 2
+                        status:
+                          type: string
+                          example: "ordered"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2025-09-04T02:54:22.000Z"
+                        name_food:
+                          type: string
+                          example: "mon2"
+                        price:
+                          type: integer
+                          example: 25000
+                        image_url:
+                          type: string
+                          example: "/resources/img_foods/1756954364734-136343092.png"
+                        total_price:
+                          type: integer
+                          example: 50000
         "401":
           description: Unauthorized - Missing or invalid token
         "500":
           description: Internal server error
-              

@@ -68,5 +68,6 @@ initDB().then(() => {
 
   app.listen(PORT, () => {
     console.log(`listening on http://localhost:${PORT}/home`);
+    console.log(`test api on http://localhost:${PORT}/api-docs`);
   });
 });

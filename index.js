@@ -3,8 +3,12 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const session = require("express-session");
+const initDB = require("./initDB");
 
 require("dotenv").config();
+
+
+
 
 const app = express();
 
@@ -52,12 +56,17 @@ const swaggerDocument = YAML.load(path.join(__dirname, "swagger.yaml"));
 
 // Tạo route Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-
-
 // Khởi độhg server
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`listening on http://localhost:${PORT}/home`);
+// Gọi initDB trước khi start server
+initDB().then(() => {
+
+  // app.listen(PORT, () => {
+  //   console.log(`listening on http://localhost:${PORT}/home`);
+  // });
+
+  app.listen(PORT, () => {
+    console.log(`listening on http://localhost:${PORT}/home`);
+  });
 });

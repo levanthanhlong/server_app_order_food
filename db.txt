@@ -32,7 +32,7 @@ CREATE TABLE orders (
     user_id INT NOT NULL,
     food_id INT NOT NULL,  -- Món ăn duy nhất trong đơn
     quantity INT NOT NULL DEFAULT 1,  -- Số suất ăn đặt
-    order_date DATE NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('ordered', 'not_ordered') DEFAULT 'not_ordered',  -- Trạng thái đơn hàng
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

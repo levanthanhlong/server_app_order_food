@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const userModels = require("../models/usersModels");
 
 const register = async (req, res) => {
-  const { username, fullname, password, employeeCode } = req.body;
+  const { username, fullname, password, employeeCode, role } = req.body;
   try {
     const isExistUser = await userModels.findUserByUserName(username);
     if (isExistUser) {
@@ -12,7 +12,6 @@ const register = async (req, res) => {
         message: "Tên đăng nhập đã tồn tại",
       });
     }
-    const role = 'user'
     //get userId after register successfully
     const userId = await userModels.addUser(
       username,
